@@ -2,9 +2,73 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KaraokeLive - Karaokê Profissional</title>
     <style>
-        /* ... (mesmo estilo anterior) ... */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .app-container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .control-panel, .youtube-section, .lyrics-container {
+            padding: 20px;
+        }
+        .button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin: 10px 0;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .button:hover {
+            background: #45a049;
+        }
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .video {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .video img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .video-title {
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .status-message {
+            color: red;
+            font-weight: bold;
+        }
+        #videoPlayer {
+            display: none;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -43,9 +107,7 @@
     const apiKey = 'AIzaSyCq1xEZB3QYV8u5iQRYaZaxlT0q3DlzXjA'; // Sua chave API
     let audioContext;
     let microphone;
-    let output;
     let gainNode;
-    let audioElement;
 
     document.getElementById('searchButton').addEventListener('click', function() {
         const query = document.getElementById('searchInput').value + ' karaokê';
@@ -83,7 +145,9 @@
     document.getElementById('musicVolume').addEventListener('input', function() {
         const volume = this.value / 100; // Converte para a faixa de 0 a 1
         const youtubeFrame = document.getElementById('youtubeFrame');
-        youtubeFrame.contentWindow.postMessage({ volume: volume }, '*'); // Envia o volume para o iframe do YouTube
+        // Não é possível controlar o volume diretamente de um iframe do YouTube devido a políticas de segurança
+        // Se fosse um elemento de áudio próprio, poderíamos controlar assim
+        // audioElement.volume = volume; 
     });
 
     function fetchVideos(query) {
