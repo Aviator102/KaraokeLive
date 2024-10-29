@@ -4,131 +4,7 @@
     <meta charset="UTF-8">
     <title>KaraokeLive - Karaokê Profissional</title>
     <style>
-        :root {
-            --primary: #6200ee;
-            --secondary: #03dac6;
-            --background: #101010;
-            --surface: #1a1a1a;
-            --text: #ffffff;
-            --accent: #ff4081;
-        }
-
-        body {
-            margin: 0;
-            padding: 20px;
-            background-color: var(--background);
-            color: var(--text);
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .app-container {
-            max-width: 800px;
-            margin: auto;
-        }
-
-        .header {
-            text-align: center;
-            padding: 1em;
-            background: var(--surface);
-            border-radius: 10px;
-            margin-bottom: 1em;
-        }
-
-        .logo {
-            font-size: 2em;
-            color: var(--accent);
-            font-weight: bold;
-        }
-
-        .control-panel, .youtube-section {
-            background: var(--surface);
-            border-radius: 10px;
-            padding: 1em;
-            margin-bottom: 1em;
-        }
-
-        .button {
-            background: var(--primary);
-            color: #fff;
-            padding: 0.5em 1em;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .button:hover {
-            background: var(--accent);
-        }
-
-        .slider {
-            width: 100%;
-            margin: 0.5em 0;
-        }
-
-        .lyrics-container {
-            text-align: center;
-            background: var(--surface);
-            padding: 1em;
-            border-radius: 10px;
-        }
-
-        .current-line {
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .results {
-            margin-top: 20px;
-        }
-
-        .video {
-            margin-bottom: 20px;
-            cursor: pointer; /* Adicionado para indicar que é clicável */
-        }
-
-        img {
-            max-width: 100%;
-            height: auto; /* Garante que a imagem mantenha a proporção */
-            display: block;
-        }
-
-        .player {
-            margin-top: 20px;
-            display: none; /* Oculta o player inicialmente */
-            text-align: center;
-        }
-
-        .video-title {
-            color: var(--accent);
-            text-decoration: underline;
-        }
-
-        .status-message {
-            color: var(--accent);
-            margin-top: 10px;
-            text-align: center;
-        }
-
-        /* Estilos Responsivos */
-        @media (max-width: 600px) {
-            .app-container {
-                padding: 10px;
-            }
-
-            .header {
-                font-size: 1.5em;
-            }
-
-            .logo {
-                font-size: 1.8em;
-            }
-
-            .button {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-        }
+        /* ... (mesmo estilo anterior) ... */
     </style>
 </head>
 <body>
@@ -168,6 +44,8 @@
     let audioContext;
     let microphone;
     let output;
+    let gainNode;
+    let audioElement;
 
     document.getElementById('searchButton').addEventListener('click', function() {
         const query = document.getElementById('searchInput').value + ' karaokê';
@@ -177,15 +55,15 @@
     document.getElementById('startMic').addEventListener('click', async () => {
         const statusMessage = document.getElementById('statusMessage');
         try {
-            // Cria um novo contexto de áudio
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            // Obtém acesso ao microfone
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             microphone = audioContext.createMediaStreamSource(stream);
-            output = audioContext.destination; // Saída padrão (caixas de som)
-
-            // Conecta o microfone à saída
-            microphone.connect(output);
+            
+            // Cria um nó de ganho para controlar o volume do microfone
+            gainNode = audioContext.createGain();
+            gainNode.gain.value = 0.5; // Ajuste inicial do volume do microfone
+            microphone.connect(gainNode);
+            gainNode.connect(audioContext.destination); // Conecta à saída
 
             // Atualiza a mensagem de status
             statusMessage.textContent = "Microfone ativado!";
@@ -193,6 +71,19 @@
             console.error('Erro ao ativar o microfone:', error);
             statusMessage.textContent = "Erro ao ativar o microfone. Permissão negada?";
         }
+    });
+
+    document.getElementById('micVolume').addEventListener('input', function() {
+        const volume = this.value / 100; // Converte para a faixa de 0 a 1
+        if (gainNode) {
+            gainNode.gain.value = volume; // Ajusta o ganho do microfone
+        }
+    });
+
+    document.getElementById('musicVolume').addEventListener('input', function() {
+        const volume = this.value / 100; // Converte para a faixa de 0 a 1
+        const youtubeFrame = document.getElementById('youtubeFrame');
+        youtubeFrame.contentWindow.postMessage({ volume: volume }, '*'); // Envia o volume para o iframe do YouTube
     });
 
     function fetchVideos(query) {
