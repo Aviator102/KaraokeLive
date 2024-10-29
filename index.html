@@ -141,7 +141,6 @@
     <div class="control-panel">
         <h2>Controles de Áudio</h2>
         <button id="startMic" class="button">Ativar Microfone</button>
-        <button id="connectBluetooth" class="button">Conectar Bluetooth</button>
         <h3>Volume do Microfone</h3>
         <input type="range" class="slider" id="micVolume" min="0" max="100" value="50">
         <h3>Volume da Música</h3>
@@ -153,10 +152,10 @@
         <h2>Buscar Música</h2>
         <input type="text" class="search-bar" id="searchInput" placeholder="Digite o nome da música ou artista...">
         <button class="button" id="searchButton">Buscar</button>
-        <div class="results" id="results"></div>
         <div class="player" id="videoPlayer">
             <iframe id="youtubeFrame" width="100%" height="315" src="" frameborder="0" allowfullscreen></iframe>
         </div>
+        <div class="results" id="results"></div>
     </div>
 
     <div class="lyrics-container">
@@ -181,20 +180,6 @@
         } catch (error) {
             console.error('Erro ao ativar o microfone:', error);
             statusMessage.textContent = "Erro ao ativar o microfone. Permissão negada?";
-        }
-    });
-
-    document.getElementById('connectBluetooth').addEventListener('click', async () => {
-        const statusMessage = document.getElementById('statusMessage');
-        try {
-            const device = await navigator.bluetooth.requestDevice({
-                filters: [{ services: ['audio_stream'] }] // Exemplo de filtro, ajuste conforme necessário
-            });
-            // Dispositivo Bluetooth conectado
-            statusMessage.textContent = `Conectado ao dispositivo: ${device.name}`;
-        } catch (error) {
-            console.error('Erro ao conectar Bluetooth:', error);
-            statusMessage.textContent = "Erro ao conectar ao Bluetooth.";
         }
     });
 
