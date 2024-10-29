@@ -84,10 +84,12 @@
 
         .video {
             margin-bottom: 20px;
+            cursor: pointer; /* Adicionado para indicar que é clicável */
         }
 
         img {
-            max-width: 200px;
+            max-width: 100%;
+            height: auto; /* Garante que a imagem mantenha a proporção */
             display: block;
         }
 
@@ -98,9 +100,34 @@
         }
 
         .video-title {
-            cursor: pointer;
             color: var(--accent);
             text-decoration: underline;
+        }
+
+        .status-message {
+            color: var(--accent);
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* Estilos Responsivos */
+        @media (max-width: 600px) {
+            .app-container {
+                padding: 10px;
+            }
+
+            .header {
+                font-size: 1.5em;
+            }
+
+            .logo {
+                font-size: 1.8em;
+            }
+
+            .button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -114,11 +141,12 @@
     <div class="control-panel">
         <h2>Controles de Áudio</h2>
         <button id="startMic" class="button">Ativar Microfone</button>
-        <button id="connectBluetooth" class="button" style="margin-left: 10px;">Conectar Bluetooth</button>
+        <button id="connectBluetooth" class="button">Conectar Bluetooth</button>
         <h3>Volume do Microfone</h3>
         <input type="range" class="slider" id="micVolume" min="0" max="100" value="50">
         <h3>Volume da Música</h3>
         <input type="range" class="slider" id="musicVolume" min="0" max="100" value="50">
+        <div id="statusMessage" class="status-message"></div>
     </div>
 
     <div class="youtube-section">
@@ -142,6 +170,32 @@
     document.getElementById('searchButton').addEventListener('click', function() {
         const query = document.getElementById('searchInput').value + ' karaokê';
         fetchVideos(query);
+    });
+
+    document.getElementById('startMic').addEventListener('click', async () => {
+        const statusMessage = document.getElementById('statusMessage');
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // O microfone foi ativado com sucesso
+            statusMessage.textContent = "Microfone ativado!";
+        } catch (error) {
+            console.error('Erro ao ativar o microfone:', error);
+            statusMessage.textContent = "Erro ao ativar o microfone. Permissão negada?";
+        }
+    });
+
+    document.getElementById('connectBluetooth').addEventListener('click', async () => {
+        const statusMessage = document.getElementById('statusMessage');
+        try {
+            const device = await navigator.bluetooth.requestDevice({
+                filters: [{ services: ['audio_stream'] }] // Exemplo de filtro, ajuste conforme necessário
+            });
+            // Dispositivo Bluetooth conectado
+            statusMessage.textContent = `Conectado ao dispositivo: ${device.name}`;
+        } catch (error) {
+            console.error('Erro ao conectar Bluetooth:', error);
+            statusMessage.textContent = "Erro ao conectar ao Bluetooth.";
+        }
     });
 
     function fetchVideos(query) {
@@ -188,6 +242,9 @@
         const youtubeFrame = document.getElementById('youtubeFrame');
         youtubeFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
         document.getElementById('videoPlayer').style.display = 'block'; // Mostra o player
+
+        // Rolagem para a seção de resultados
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
     }
 </script>
 </body>
