@@ -2,14 +2,15 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> <!-- Impede o zoom -->
     <title>KaraokeLive - Karaokê Profissional</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #e8f5e9;
             margin: 0;
             padding: 20px;
+            touch-action: manipulation; /* Impede gestos de zoom */
         }
         .app-container {
             max-width: 600px;
@@ -20,7 +21,7 @@
             overflow: hidden;
         }
         .header {
-            background: #4CAF50;
+            background: #388e3c;
             color: white;
             padding: 10px 0;
             text-align: center;
@@ -29,7 +30,7 @@
             padding: 20px;
         }
         .button {
-            background: #4CAF50;
+            background: #388e3c;
             color: white;
             border: none;
             padding: 10px;
@@ -39,7 +40,7 @@
             width: 100%;
         }
         .button:hover {
-            background: #45a049;
+            background: #2e7d32;
         }
         .slider {
             width: 100%;
@@ -81,6 +82,7 @@
     <div class="control-panel">
         <h2>Controles de Áudio</h2>
         <button id="startMic" class="button">Ativar Microfone</button>
+        <button id="stopMic" class="button" style="display: none;">Desligar Microfone</button>
         <h3>Volume do Microfone</h3>
         <input type="range" class="slider" id="micVolume" min="0" max="100" value="50">
         <h3>Volume da Música</h3>
@@ -129,9 +131,23 @@
 
             // Atualiza a mensagem de status
             statusMessage.textContent = "Microfone ativado!";
+            document.getElementById('startMic').style.display = 'none'; // Esconde botão de ativar
+            document.getElementById('stopMic').style.display = 'block'; // Mostra botão de desligar
         } catch (error) {
             console.error('Erro ao ativar o microfone:', error);
             statusMessage.textContent = "Erro ao ativar o microfone. Permissão negada?";
+        }
+    });
+
+    document.getElementById('stopMic').addEventListener('click', () => {
+        if (microphone) {
+            microphone.disconnect(); // Desconecta o microfone
+            microphone = null;
+            gainNode.disconnect(); // Desconecta o ganho
+            gainNode = null;
+            document.getElementById('statusMessage').textContent = "Microfone desligado.";
+            document.getElementById('startMic').style.display = 'block'; // Mostra botão de ativar
+            document.getElementById('stopMic').style.display = 'none'; // Esconde botão de desligar
         }
     });
 
