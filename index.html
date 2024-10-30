@@ -202,6 +202,7 @@
             title.addEventListener('click', function() {
                 const videoId = this.getAttribute('data-video-id');
                 playVideo(videoId);
+                scrollToVideoPlayer(); // Chama a função para rolar até o player de vídeo
             });
         });
     }
@@ -210,9 +211,14 @@
         const youtubeFrame = document.getElementById('youtubeFrame');
         youtubeFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
         document.getElementById('videoPlayer').style.display = 'block'; // Mostra o player
+    }
 
-        // Rolagem para a seção de resultados
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    function scrollToVideoPlayer() {
+        const videoPlayer = document.getElementById('videoPlayer');
+        const rect = videoPlayer.getBoundingClientRect(); // Obtém a posição do player em relação à viewport
+        const scrollY = window.scrollY || window.pageYOffset; // Obtém a rolagem atual
+        const center = rect.top + scrollY - (window.innerHeight / 2) + (rect.height / 2); // Calcula a nova posição para centralizar o player
+        window.scrollTo({ top: center, behavior: 'smooth' }); // Rola suavemente até a nova posição
     }
 </script>
 </body>
